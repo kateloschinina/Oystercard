@@ -61,13 +61,17 @@ describe Oystercard do
 
   describe 'touch_in' do
     it 'sets value for variable in_journey to true' do
-      card1.touch_in
-      expect(card1).to be_in_journey
+      card2.touch_in
+      expect(card2).to be_in_journey
     end
     it 'raises an error if card already checked in' do
       error_message = "You have already touched in!"
-      card1.in_journey = true
-      expect {card1.touch_in}.to raise_error(error_message)
+      card2.in_journey = true
+      expect {card2.touch_in}.to raise_error(error_message)
+    end
+    it 'raised an error if card has insufficient funds' do
+      error_message = "Insufficient funds for the journey."
+      expect{card1.touch_in}.to raise_error(error_message)
     end
   end
 

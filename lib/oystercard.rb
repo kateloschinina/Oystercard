@@ -2,16 +2,19 @@ class Oystercard
 
   MAX_BALANCE = 90
   MIN_BALANCE = -5
+  MIN_FARE = 1
 
-  def initialize(in_journey = false, amount = 0, min_balance = MIN_BALANCE, max_balance = MAX_BALANCE)
+  def initialize(in_journey = false, amount = 0, min_balance = MIN_BALANCE, max_balance = MAX_BALANCE, min_fare = MIN_FARE)
     @balance = amount
     @min_balance = min_balance
     @max_balance = max_balance
+    @min_fare = min_fare
     @in_journey = in_journey
   end
 
   attr_accessor :min_balance
   attr_accessor :max_balance
+  attr_accessor :min_fare
   attr_reader :balance
   attr_accessor :in_journey
 
@@ -27,6 +30,7 @@ class Oystercard
 
   def touch_in
     already_in?
+    sufficient_funds?
     @in_journey = true
   end
 
@@ -59,6 +63,11 @@ class Oystercard
   def already_out?
     error_message = "You have already touched out!"
     raise error_message if !@in_journey
+  end
+
+  def sufficient_funds?
+    error_message = "Insufficient funds for the journey."
+    raise error_message if @balance < @min_fare
   end
 
 end
