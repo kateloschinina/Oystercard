@@ -1,9 +1,10 @@
-# frozen_string_literal: true
 source "https://rubygems.org"
 
-# gem "rails"
-ruby "2.3.3"
+ruby "2.4.0"
 
 # other gems
-gem 'rspec'
+group :development, :test do
+  gem 'rspec'
+end
+
 gem 'pry'
