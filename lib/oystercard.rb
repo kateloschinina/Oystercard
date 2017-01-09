@@ -16,21 +16,49 @@ class Oystercard
   attr_accessor :in_journey
 
   def top_up(amount)
-    error_message = "Your card's balance cannot exceed £#{@max_balance}."
-    raise error_message if @balance + amount > @max_balance
+    exceed_max_balance?(amount)
     @balance += amount
   end
 
   def deduct(amount)
-    error_message = "Your card's balance can't go below £#{@min_balance}."
-    raise error_message if @balance - amount < @min_balance
+    exceed_min_balance?(amount)
     @balance -= amount
   end
 
   def touch_in
+    already_in?
+    @in_journey = true
+  end
+
+  def touch_out
+    already_out?
+    @in_journey = false
+  end
+
+  def in_journey?
+    @in_journey
+  end
+
+  private
+
+  def exceed_max_balance?(amount)
+    error_message = "Your card's balance cannot exceed £#{@max_balance}."
+    raise error_message if @balance + amount > @max_balance
+  end
+
+  def exceed_min_balance?(amount)
+    error_message = "Your card's balance can't go below £#{@min_balance}."
+    raise error_message if @balance - amount < @min_balance
+  end
+
+  def already_in?
     error_message = "You have already touched in!"
     raise error_message if @in_journey
-    @in_journey = true
+  end
+
+  def already_out?
+    error_message = "You have already touched out!"
+    raise error_message if !@in_journey
   end
 
 end
