@@ -10,6 +10,9 @@ describe Oystercard do
     it 'checks whether creates an instance of a class' do
       expect(card1).to be_a(Oystercard)
     end
+    it 'has a balance of 0' do
+      expect(card1.balance).to eq(0)
+    end
   end
 
   describe 'accessing balance' do
@@ -25,6 +28,11 @@ describe Oystercard do
       number = 10
       card1.top_up(number)
       expect(card1.balance).to eq(number)
+    end
+    it 'stops user from having a balance beyond £90' do
+      maximum_balance = Oystercard::MAX_BALANCE
+      error_message = "Your card's balance cannot exceed £#{maximum_balance}."
+      expect {card1.top_up(maximum_balance + 1)}.to raise_error (error_message)
     end
   end
 end
