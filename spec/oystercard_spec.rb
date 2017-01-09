@@ -4,7 +4,7 @@ describe Oystercard do
 
   init_amount = 50
   subject(:card1) { described_class.new }
-  subject(:card2) { described_class.new init_amount }
+  subject(:card2) { described_class.new false, init_amount }
 
   maximum_balance = Oystercard::MAX_BALANCE
   minimum_balance = Oystercard::MIN_BALANCE
@@ -39,13 +39,35 @@ describe Oystercard do
 
   describe 'deduct' do
     #it {is_expected.to respond_to(:deduct).with(1).argument}
-    it 'duducts by the number' do
+    it 'deducts by the number' do
       number = 3
       expect{ card1.deduct number }.to change{ card1.balance }.by -number
     end
     it "stops user from having a balance below £#{minimum_balance}" do
       error_message = "Your card's balance can't go below £#{minimum_balance}."
       expect {card1.deduct(-minimum_balance + 1)}.to raise_error(error_message)
+    end
+  end
+
+  describe 'in_journey' do
+    it 'checks that card is not in journey by default' do
+      expect(card1.in_journey).to be(false)
+    end
+    it 'reports if the card object is in journey' do
+      card1.in_journey = true
+      expect(card1.in_journey).to be true
+    end
+  end
+
+  describe 'touch_in' do
+    it 'sets value for variable in_journey to true' do
+      card1.touch_in
+      expect(card1.in_journey).to be true
+    end
+    it 'raises an error if card already checked in' do
+      error_message = "You have already touched in!"
+      card1.in_journey = true
+      expect {card1.touch_in}.to raise_error(error_message)
     end
   end
 end
