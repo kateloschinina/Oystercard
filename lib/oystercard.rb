@@ -1,18 +1,18 @@
 class Oystercard
 
   MAX_BALANCE = 90
-  MIN_BALANCE = -5
+  #MIN_BALANCE = -5
   MIN_FARE = 1
 
-  def initialize(in_journey = false, amount = 0, min_balance = MIN_BALANCE, max_balance = MAX_BALANCE, min_fare = MIN_FARE)
+  def initialize(in_journey = false, amount = 0, max_balance = MAX_BALANCE, min_fare = MIN_FARE)
     @balance = amount
-    @min_balance = min_balance
+    #@min_balance = min_balance
     @max_balance = max_balance
     @min_fare = min_fare
     @in_journey = in_journey
   end
 
-  attr_accessor :min_balance
+  #attr_accessor :min_balance
   attr_accessor :max_balance
   attr_accessor :min_fare
   attr_reader :balance
@@ -23,11 +23,6 @@ class Oystercard
     @balance += amount
   end
 
-  def deduct(amount)
-    exceed_min_balance?(amount)
-    @balance -= amount
-  end
-
   def touch_in
     already_in?
     sufficient_funds?
@@ -36,6 +31,7 @@ class Oystercard
 
   def touch_out
     already_out?
+    deduct(@min_fare)
     @in_journey = false
   end
 
@@ -45,15 +41,20 @@ class Oystercard
 
   private
 
+  def deduct(amount)
+    #exceed_min_balance?(amount)
+    @balance -= amount
+  end
+
   def exceed_max_balance?(amount)
     error_message = "Your card's balance cannot exceed £#{@max_balance}."
     raise error_message if @balance + amount > @max_balance
   end
 
-  def exceed_min_balance?(amount)
-    error_message = "Your card's balance can't go below £#{@min_balance}."
-    raise error_message if @balance - amount < @min_balance
-  end
+  #def exceed_min_balance?(amount)
+  #  error_message = "Your card's balance can't go below £#{@min_balance}."
+  #  raise error_message if @balance - amount < @min_balance
+  #end
 
   def already_in?
     error_message = "You have already touched in!"

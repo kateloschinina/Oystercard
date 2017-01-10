@@ -8,3 +8,5 @@ group :development, :test do
 end
 
 gem 'pry'
+gem 'makersinit'
+'makersinit'
