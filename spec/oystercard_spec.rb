@@ -3,8 +3,9 @@ require 'oystercard'
 describe Oystercard do
 
   init_amount = 50
+  let(:station) {"Bank"}
   subject(:card1) { described_class.new }
-  subject(:card2) { described_class.new false, init_amount }
+  subject(:card2) { described_class.new init_amount }
 
   maximum_balance = Oystercard::MAX_BALANCE
   #minimum_balance = Oystercard::MIN_BALANCE
@@ -53,44 +54,57 @@ describe Oystercard do
 =end
 
   describe 'in_journey' do
+    let(:station) {double :station}
     it 'checks that card is not in journey by default' do
-      expect(card1.in_journey).to be(false)
+      expect(card1.in_journey?).to be(false)
     end
     it 'reports if the card object is in journey' do
-      card1.in_journey = true
-      expect(card1).to be_in_journey
+      card2.touch_in(station)
+      expect(card2).to be_in_journey
     end
   end
 
   describe 'touch_in' do
+    let(:station) {double :station}
     it 'sets value for variable in_journey to true' do
-      card2.touch_in
+      card2.touch_in(station)
       expect(card2).to be_in_journey
     end
     it 'raises an error if card already checked in' do
       error_message = "You have already touched in!"
-      card2.in_journey = true
-      expect {card2.touch_in}.to raise_error(error_message)
+      card2.touch_in(station)
+      expect {card2.touch_in(station)}.to raise_error(error_message)
     end
     it 'raised an error if card has insufficient funds' do
       error_message = "Insufficient funds for the journey."
-      expect{card1.touch_in}.to raise_error(error_message)
+      expect{card1.touch_in(station)}.to raise_error(error_message)
+    end
+    it { is_expected.to respond_to(:touch_in).with(1).argument }
+    it "passes station to entry_station instance" do
+      card2.touch_in(station)
+      expect(card2.entry_station).to eq(station)
     end
   end
 
   describe 'touch_out' do
+    let(:station) {double :station}
     it 'sets value for variable in_journey to false' do
-      card1.in_journey = true
-      card1.touch_out
-      expect(card1).not_to be_in_journey
+      card2.touch_in(station)
+      card2.touch_out
+      expect(card2).not_to be_in_journey
     end
     it "deducts the minimum fare of £#{min_fare} when touching out" do
-      card2.touch_in
+      card2.touch_in(station)
       expect{ card2.touch_out }.to change{ card2.balance }.by -min_fare
     end
     it 'raises an error if card already checked out' do
       error_message = "You have already touched out!"
       expect {card1.touch_out}.to raise_error(error_message)
+    end
+    it 'sets entry station to nil' do
+      card2.touch_in(station)
+      card2.touch_out
+      expect(card2.entry_station).to eq nil
     end
   end
 

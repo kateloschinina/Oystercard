@@ -4,39 +4,38 @@ class Oystercard
   #MIN_BALANCE = -5
   MIN_FARE = 1
 
-  def initialize(in_journey = false, amount = 0, max_balance = MAX_BALANCE, min_fare = MIN_FARE)
+  def initialize(amount = 0, max_balance = MAX_BALANCE, min_fare = MIN_FARE)
     @balance = amount
     #@min_balance = min_balance
     @max_balance = max_balance
     @min_fare = min_fare
-    @in_journey = in_journey
   end
 
   #attr_accessor :min_balance
   attr_accessor :max_balance
   attr_accessor :min_fare
   attr_reader :balance
-  attr_accessor :in_journey
+  attr_reader :entry_station
 
   def top_up(amount)
     exceed_max_balance?(amount)
     @balance += amount
   end
 
-  def touch_in
+  def touch_in(station)
     already_in?
     sufficient_funds?
-    @in_journey = true
+    @entry_station = station
   end
 
   def touch_out
     already_out?
     deduct(@min_fare)
-    @in_journey = false
+    @entry_station = nil
   end
 
   def in_journey?
-    @in_journey
+    !!@entry_station
   end
 
   private
@@ -58,12 +57,12 @@ class Oystercard
 
   def already_in?
     error_message = "You have already touched in!"
-    raise error_message if @in_journey
+    raise error_message if @entry_station
   end
 
   def already_out?
     error_message = "You have already touched out!"
-    raise error_message if !@in_journey
+    raise error_message if !@entry_station
   end
 
   def sufficient_funds?
