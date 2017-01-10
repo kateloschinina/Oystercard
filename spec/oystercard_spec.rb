@@ -90,23 +90,44 @@ describe Oystercard do
     let(:station) {double :station}
     it 'sets value for variable in_journey to false' do
       card2.touch_in(station)
-      card2.touch_out
+      card2.touch_out(station)
       expect(card2).not_to be_in_journey
     end
     it "deducts the minimum fare of £#{min_fare} when touching out" do
       card2.touch_in(station)
-      expect{ card2.touch_out }.to change{ card2.balance }.by -min_fare
+      expect{ card2.touch_out(station) }.to change{ card2.balance }.by -min_fare
     end
     it 'raises an error if card already checked out' do
       error_message = "You have already touched out!"
-      expect {card1.touch_out}.to raise_error(error_message)
+      expect {card1.touch_out(station)}.to raise_error(error_message)
     end
     it 'sets entry station to nil' do
       card2.touch_in(station)
-      card2.touch_out
+      card2.touch_out(station)
       expect(card2.entry_station).to eq nil
     end
   end
 
+  describe 'history' do
+    let(:station) {double :station}
+    it 'history is empty by default' do
+      expect(card2.history).to be_empty
+    end
+    it 'shows the one journey history of the card' do
+      card2.touch_in(station)
+      card2.touch_out(station)
+      expect(card2.history).to eq ({"j1"=>[station, station]})
+    end
+    it 'shows the history of stations the card has been to, when more than 1' do
+      n = 7
+      hash = Hash.new
+      n.times do
+        card2.touch_in(station)
+        card2.touch_out(station)
+        hash.store("j#{hash.length + 1}",[station,station])
+      end
+      expect(card2.history).to eq (hash)
+    end
+  end
 
 end

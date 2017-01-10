@@ -9,6 +9,7 @@ class Oystercard
     #@min_balance = min_balance
     @max_balance = max_balance
     @min_fare = min_fare
+    @history = Hash.new
   end
 
   #attr_accessor :min_balance
@@ -16,6 +17,7 @@ class Oystercard
   attr_accessor :min_fare
   attr_reader :balance
   attr_reader :entry_station
+  attr_reader :history
 
   def top_up(amount)
     exceed_max_balance?(amount)
@@ -28,9 +30,10 @@ class Oystercard
     @entry_station = station
   end
 
-  def touch_out
+  def touch_out(station)
     already_out?
     deduct(@min_fare)
+    @history.store("j#{history.length+1}", [@entry_station, station])
     @entry_station = nil
   end
 
