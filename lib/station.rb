@@ -8,6 +8,7 @@ class Station
   def initialize(name)
     @name = name
     load_stations
+    raise "Station doesn't exist on the map yet." if !@catalog.has_key?(@name)
     @zone = @catalog[@name]
   end
 
