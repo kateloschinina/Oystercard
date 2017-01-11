@@ -109,9 +109,9 @@ describe Oystercard do
         card2.touch_in(station)
         card2.touch_out(station)
         hash.store("j#{hash.length + 1}",[station,station])
+
       end
       expect(card2.history).to eq (hash)
     end
   end
-
 end
