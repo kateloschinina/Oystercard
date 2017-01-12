@@ -55,6 +55,7 @@ describe Oystercard do
       expect(card2).to be_in_journey
     end
     it 'charges a penalty if user is trying to check in while already check in' do
+      station = Station.new 'angel'
       card2.touch_in(station)
       expect {card2.touch_in(station)}.to change{ card2.balance }.by -card2.penalty
     end
@@ -67,45 +68,44 @@ describe Oystercard do
 
   describe 'touch_out' do
     let(:station) {double :station}
-    it 'sets value for variable in_journey to false' do
-      card2.touch_in(station)
-      card2.touch_out(station)
+    it 'sets value in_journey to false' do
+      station1 = 'angel'
+      station2 = 'walthamstow'
+      card2.touch_in(station1)
+      card2.touch_out(station2)
       expect(card2).not_to be_in_journey
     end
     it "deducts the minimum fare of £#{min_fare} when touching out" do
-      card2.touch_in(station)
-      expect{ card2.touch_out(station) }.to change{ card2.balance }.by -min_fare
+      station1 = 'angel'
+      station2 = 'walthamstow'
+      card2.touch_in(station1)
+      expect{ card2.touch_out(station2) }.to change{ card2.balance }.by -2
     end
     it 'already checked out' do
       expect {card2.touch_out(station)}.to change{ card2.balance }.by -card2.penalty
-    end
-    it 'sets entry station to nil' do
-      card2.touch_in(station)
-      card2.touch_out(station)
-      expect(card2.entry_station).to eq nil
     end
   end
 
   describe 'history' do
     let(:station) {double :station}
-    it 'history is empty by default' do
-      expect(card2.history).to be_empty
-    end
     it 'shows the one journey history of the card' do
-      card2.touch_in(station)
-      card2.touch_out(station)
-      expect(card2.history).to eq ({"j1"=>[station, station]})
+      station1 = 'angel'
+      station2 = 'walthamstow'
+      card2.touch_in(station1)
+      card2.touch_out(station2)
+      expect(card2.history.journeys).to eq ({"j1"=>[station1, station2]})
     end
     it 'shows the history of stations the card has been to, when more than 1' do
-      n = 7
+      n = 4
       hash = Hash.new
+      station1 = 'bank'
+      station2 = 'angel'
       n.times do
-        card2.touch_in(station)
-        card2.touch_out(station)
-        hash.store("j#{hash.length + 1}",[station,station])
-
+        card2.touch_in(station1)
+        card2.touch_out(station2)
+        hash.store("j#{hash.length + 1}",[station1,station2])
       end
-      expect(card2.history).to eq (hash)
+      expect(card2.history.journeys).to eq (hash)
     end
   end
 end

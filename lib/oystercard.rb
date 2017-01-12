@@ -24,18 +24,22 @@ class Oystercard
   end
 
   def touch_in(station)
-    already_in?
+    already_in? if in_journey?
     sufficient_funds?
     @history.start_journey(station)
   end
 
   def touch_out(station)
-    charge_on_exit
-    log_journey(station)
+    if !in_journey?
+      already_out?
+    else
+      @history.finish_journey(station)
+      deduct(@history.journey_class.calculate_fare)
+    end
   end
 
   def in_journey?
-
+    @history.current_journey
   end
 
   private
@@ -44,31 +48,9 @@ class Oystercard
     @balance -= amount
   end
 
-  def log_journey(station)
-    @history.finish_journey(station)
-  end
-
   def exceed_max_balance?(amount)
     error_message = "Your card's balance cannot exceed £#{@max_balance}."
     raise error_message if @balance + amount > @max_balance
-  end
-
-  def already_in?
-    if @journey
-      p "You are have been charged with penalty fair of #{@penalty} as you did not touch out on your last journey."
-      deduct(@penalty)
-      log_journey("n/a")
-    end
-  end
-
-  def charge_on_exit
-    if !@journey
-      p "You are have been charged with penalty fair of #{@penalty} as you did not touch in."
-      deduct(@penalty)
-      touch_in("n/a")
-    else
-      deduct(@min_fare)
-    end
   end
 
   def sufficient_funds?
@@ -76,4 +58,15 @@ class Oystercard
     raise error_message if @balance < @min_fare
   end
 
+  def already_in?
+    p "You are have been charged with penalty fair of#{@penalty} as you did not touch out on your lastjourney."
+    deduct(@penalty)
+    @history.finish_journey("n/a")
+  end
+
+  def already_out?
+    p "You are have been charged with penalty fair of #{@penalty} as you did not touch in."
+    deduct(@penalty)
+    touch_in("n/a")
+  end
 end

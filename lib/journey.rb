@@ -1,4 +1,5 @@
 require_relative 'oystercard.rb'
+require_relative 'station.rb'
 
 class Journey
 
@@ -18,7 +19,13 @@ class Journey
   end
 
   def calculate_fare
-    Oystercard::MIN_FARE
+    if complete?
+      entry_station = Station.new(@entry_station)
+      exit_station = Station.new(@exit_station)
+      return (entry_station.zone - exit_station.zone).abs+1
+    else
+      raise "It is not possible to culculate fare for uncompleted journey"
+    end
   end
 
   def complete?

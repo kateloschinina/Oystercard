@@ -1,8 +1,12 @@
 require 'journey'
+require 'station'
 
 describe Journey do
 
   subject(:journey) { described_class.new }
+  entry_station = "angel"
+  exit_station = "walthamstow"
+  subject(:journey2) { described_class.new entry_station, exit_station}
 
   it 'class has been created' do
     expect(subject).to be_a(Journey)
@@ -28,8 +32,8 @@ describe Journey do
 
   describe 'calculate fare' do
     it {is_expected.to respond_to(:calculate_fare).with(0).argument}
-    it 'returns min fare' do
-      expect(journey.calculate_fare).to eq(Oystercard::MIN_FARE)
+    it 'calculates fare' do
+      expect(journey2.calculate_fare).to eq(2)
     end
   end
 
