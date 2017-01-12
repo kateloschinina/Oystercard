@@ -1,20 +1,21 @@
+require_relative 'journey.rb'
+
 class Oystercard
 
   MAX_BALANCE = 90
   MIN_FARE = 1
+  PENALTY = 6
 
-  def initialize(amount = 0, max_balance = MAX_BALANCE, min_fare = MIN_FARE)
+  def initialize(amount = 0, max_balance = MAX_BALANCE, min_fare = MIN_FARE, penalty = PENALTY)
     @balance = amount
     @max_balance = max_balance
     @min_fare = min_fare
+    @penalty = penalty
     @history = Hash.new
   end
 
-  attr_accessor :max_balance
-  attr_accessor :min_fare
-  attr_reader :balance
-  attr_reader :entry_station
-  attr_reader :history
+  attr_accessor :max_balance, :min_fare, :penalty
+  attr_reader :balance, :entry_station, :history
 
   def top_up(amount)
     exceed_max_balance?(amount)
@@ -24,18 +25,16 @@ class Oystercard
   def touch_in(station)
     already_in?
     sufficient_funds?
-    @entry_station = station
+    @journey = Journey.new(station)
   end
 
   def touch_out(station)
-    already_out?
-    deduct(@min_fare)
-    @history.store("j#{history.length+1}", [@entry_station, station])
-    @entry_station = nil
+    charge_on_exit
+    log_journey(station)
   end
 
   def in_journey?
-    !!@entry_station
+    !!@journey
   end
 
   private
@@ -44,19 +43,33 @@ class Oystercard
     @balance -= amount
   end
 
+  def log_journey(station)
+    @journey.end_journey(station)
+    @history.store("j#{history.length+1}", [@journey.entry_station, @journey.exit_station])
+    @journey = nil
+  end
+
   def exceed_max_balance?(amount)
     error_message = "Your card's balance cannot exceed £#{@max_balance}."
     raise error_message if @balance + amount > @max_balance
   end
 
   def already_in?
-    error_message = "You have already touched in!"
-    raise error_message if @entry_station
+    if @journey
+      p "You are have been charged with penalty fair of #{@penalty} as you did not touch out on your last journey."
+      deduct(@penalty)
+      log_journey("n/a")
+    end
   end
 
-  def already_out?
-    error_message = "You have already touched out!"
-    raise error_message if !@entry_station
+  def charge_on_exit
+    if !@journey
+      p "You are have been charged with penalty fair of #{@penalty} as you did not touch in."
+      deduct(@penalty)
+      touch_in("n/a")
+    else
+      deduct(@min_fare)
+    end
   end
 
   def sufficient_funds?

@@ -54,20 +54,15 @@ describe Oystercard do
       card2.touch_in(station)
       expect(card2).to be_in_journey
     end
-    it 'raises an error if card already checked in' do
-      error_message = "You have already touched in!"
+    it 'charges a penalty if user is trying to check in while already check in' do
       card2.touch_in(station)
-      expect {card2.touch_in(station)}.to raise_error(error_message)
+      expect {card2.touch_in(station)}.to change{ card2.balance }.by -card2.penalty
     end
     it 'raised an error if card has insufficient funds' do
       error_message = "Insufficient funds for the journey."
       expect{card1.touch_in(station)}.to raise_error(error_message)
     end
     it { is_expected.to respond_to(:touch_in).with(1).argument }
-    it "passes station to entry_station instance" do
-      card2.touch_in(station)
-      expect(card2.entry_station).to eq(station)
-    end
   end
 
   describe 'touch_out' do
@@ -81,9 +76,8 @@ describe Oystercard do
       card2.touch_in(station)
       expect{ card2.touch_out(station) }.to change{ card2.balance }.by -min_fare
     end
-    it 'raises an error if card already checked out' do
-      error_message = "You have already touched out!"
-      expect {card1.touch_out(station)}.to raise_error(error_message)
+    it 'already checked out' do
+      expect {card2.touch_out(station)}.to change{ card2.balance }.by -card2.penalty
     end
     it 'sets entry station to nil' do
       card2.touch_in(station)
