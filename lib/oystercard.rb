@@ -1,4 +1,5 @@
 require_relative 'journey.rb'
+require_relative 'journey_log.rb'
 
 class Oystercard
 
@@ -11,7 +12,7 @@ class Oystercard
     @max_balance = max_balance
     @min_fare = min_fare
     @penalty = penalty
-    @history = Hash.new
+    @history = JourneyLog.new
   end
 
   attr_accessor :max_balance, :min_fare, :penalty
@@ -25,7 +26,7 @@ class Oystercard
   def touch_in(station)
     already_in?
     sufficient_funds?
-    @journey = Journey.new(station)
+    @history.start_journey(station)
   end
 
   def touch_out(station)
@@ -34,7 +35,7 @@ class Oystercard
   end
 
   def in_journey?
-    !!@journey
+
   end
 
   private
@@ -44,9 +45,7 @@ class Oystercard
   end
 
   def log_journey(station)
-    @journey.end_journey(station)
-    @history.store("j#{history.length+1}", [@journey.entry_station, @journey.exit_station])
-    @journey = nil
+    @history.finish_journey(station)
   end
 
   def exceed_max_balance?(amount)
