@@ -1,12 +1,10 @@
 source "https://rubygems.org"
 
-ruby "2.4.0"
+ruby '2.4.0'
 
-# other gems
 group :development, :test do
-  gem 'rspec'
+	gem "rspec"
+  gem "pry"
+	gem "coveralls" , require: false
+	gem "rake"
 end
-
-gem 'pry'
-gem 'makersinit'
-'makersinit'
